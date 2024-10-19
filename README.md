@@ -57,7 +57,8 @@ What action do you want to perform? Select a number:
 2) apply
 3) destroy
 #? 2
-Which module do you want to destroy? Select a number:
+
+Which module do you want to plan? Select a number:
 1) ec2_create_delete
 2) ec2_start_stop
 #? 1
@@ -76,7 +77,7 @@ ssh -i ~/.ssh/example.pem ec2-user@<instance_public_ip>
 6. Destroy the EC2 instance
 
 ```bash
-./terraform-manager
+./terraform-ec2-manager
 
 # Select destroy (3)
 # Select the module to destroy (1)
