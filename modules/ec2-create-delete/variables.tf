@@ -1,43 +1,43 @@
 variable "instance_name" {
-    type = string
+  type = string
 }
 
 variable "key_name" {
-    type = string
+  type = string
 }
 
 variable "instance_type" {
-    type = string
+  type = string
 }
 
 variable "instance_public" {
-    type = bool
+  type = bool
 }
 
 variable "volume_size" {
-    type = number
+  type = number
 }
 
 variable "vpc_cidr_block" {
-    type = string
+  type = string
 }
 
 variable "subnet_cidr_block" {
-    type = string
+  type = string
 }
 
 variable "internet_cidr_block" {
-    type = string
+  type = string
 }
 
 variable "allowed_cidr_blocks" {
-    type = list(string)
+  type = list(string)
 }
 
 variable "volume_type" {
-    type = string
+  type = string
 }
 
 variable "ami" {
-    type = string
+  type = string
 }
