@@ -1,6 +1,6 @@
 # Terraform EC2 Manager
 
-This terraform repo contains the necessary code to manage EC2 instances in AWS, including the creation of the instances, starting and stopping them, and destroying them,... with best practices.
+This Terraform repository contains the EC2 Terraform Manager, a tool designed to manage EC2 instances in AWS. It supports creating, starting, stopping, and destroying EC2 instances, following best practices.
 
 ## Requirements
 
@@ -8,6 +8,9 @@ This terraform repo contains the necessary code to manage EC2 instances in AWS, 
 - AWS account: [Create an AWS account](https://aws.amazon.com/)
 - AWS CLI installed and configured: [Install AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - AWS credentials configured: [Configure AWS credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+- AWS keypair created: [Create an AWS keypair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html)
+
+> We won't cover the keypair creation in this guide because it's a one-time setup. Make sure you have an AWS keypair created before starting.
 
 ## Quick Start
 
@@ -37,14 +40,27 @@ instance_name    = "example-server"
 key_name         = "example"
 ```
 
-4. Apply the terraform project
+4. Apply the terraform project using the manager script
 
 ```bash
-# (Optional) Plan the terraform project if you want to see the changes before applying them
-terraform plan
+./terraform-ec2-manager
+```
 
-# Apply the terraform project
-terraform apply
+5. Example usage
+
+```bash
+➜ ./terraform-ec2-manager
+Success! The configuration is valid.
+
+What action do you want to perform? Select a number:
+1) plan
+2) apply
+3) destroy
+#? 2
+Which module do you want to destroy? Select a number:
+1) ec2_create_delete
+2) ec2_start_stop
+#? 1
 ```
 
 5. Check if the EC2 instance is created successfully on the AWS console
@@ -60,9 +76,11 @@ ssh -i ~/.ssh/example.pem ec2-user@<instance_public_ip>
 6. Destroy the EC2 instance
 
 ```bash
-terraform destroy
-```
+./terraform-manager
 
+# Select destroy (3)
+# Select the module to destroy (1)
+```
 
 ## License
 

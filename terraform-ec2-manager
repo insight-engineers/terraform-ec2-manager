@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Suppress Terraform warnings
+export TF_CLI_ARGS_plan="-compact-warnings"
+export TF_CLI_ARGS_apply="-compact-warnings"
+export TF_CLI_ARGS_destroy="-compact-warnings"
+
+echo "Terraform execution started"
+
+# Check if Terraform is installed
+if ! terraform --version; then
+  echo "Terraform is not installed"
+  exit 1
+fi
+
+# Check if any .tfvars file exists
+if ! ls *.tfvars 1> /dev/null 2>&1; then
+  echo "No .tfvars file found"
+  exit 1
+fi
+
+# Initialize Terraform plugins only if validation fails
+if ! terraform validate; then
+  terraform init
+  if [ ! -f .terraform/.gitkeep ]; then
+    touch .terraform/.gitkeep
+  fi
+fi
+
+# Scan all modules in root main.tf
+modules=$(terraform get -update | awk '{print $2}')
+
+echo "What action do you want to perform? Select a number:"
+select action in "plan" "apply" "destroy"
+do
+  case $action in
+    plan)
+      echo "Which module do you want to plan? Select a number:"
+      select module in $modules
+      do
+        module_name=module.$module
+        terraform plan -target=$module_name
+        break
+      done
+      ;;
+    apply)
+      echo "Which module do you want to apply? Select a number:"
+      select module in $modules
+      do
+        module_name=module.$module
+        terraform apply -auto-approve -target=$module_name
+        echo "Terraform output:"
+        terraform output
+        break
+      done
+      ;;
+    destroy)
+      echo "Which module do you want to destroy? Select a number:"
+      select module in $modules
+      do
+        module_name=module.$module
+        terraform destroy -auto-approve -target=$module_name
+        echo "Note that, if you destroy ec2-create-delete module, you should also destroy ec2-start-stop module as well"
+        break
+      done
+      ;;
+    *)
+      echo "Invalid option"
+      ;;
+  esac
+  break
+done
+
+echo "Terraform execution completed"
