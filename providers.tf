@@ -12,8 +12,8 @@ terraform {
 # Run aws configure to set up the AWS CLI
 # Change the region to your preferred region
 provider "aws" {
-  region                   = "ap-southeast-1" # Singapore
-  profile                  = "default"
-  shared_config_files      = ["~/.aws/config"]
-  shared_credentials_files = ["~/.aws/credentials"]
+  region                   = var.aws_region
+  shared_config_files      = var.aws_shared_config_files
+  shared_credentials_files = var.aws_shared_credentials_files
+  profile                  = var.aws_profile
 }

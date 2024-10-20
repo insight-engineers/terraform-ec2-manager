@@ -41,3 +41,7 @@ variable "volume_type" {
 variable "ami" {
   type = string
 }
+
+variable "instance_init_script" {
+  type = string
+}

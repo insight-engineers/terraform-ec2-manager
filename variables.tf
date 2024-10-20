@@ -1,3 +1,28 @@
+# Root module: ec2
+variable "aws_region" {
+  description = "The AWS region to use"
+  type        = string
+  default     = "ap-southeast-1"
+}
+
+variable "aws_shared_config_files" {
+  description = "The shared AWS configuration files to use"
+  type        = list(string)
+  default     = ["~/.aws/config"]
+}
+
+variable "aws_shared_credentials_files" {
+  description = "The shared AWS credentials files to use"
+  type        = list(string)
+  default     = ["~/.aws/credentials"]
+}
+
+variable "aws_profile" {
+  description = "The AWS profile to use"
+  type        = string
+  default     = "default"
+}
+
 # Module: ec2-start-stop
 variable "instance_id" {
   description = "The ID of the instance to start or stop"
@@ -20,6 +45,11 @@ variable "instance_state_force" {
 }
 
 # Module: ec2-create-delete
+variable "ami" {
+  description = "The AMI to use for the instance. Defaults to the Amazon Linux 2023 AMI"
+  type        = string
+}
+
 variable "instance_name" {
   description = "The name of the instance"
   type        = string
@@ -78,8 +108,11 @@ variable "volume_type" {
   default     = "gp3"
 }
 
-variable "ami" {
-  description = "The AMI to use for the instance. Defaults to the Amazon Linux 2023 AMI"
+variable "instance_init_script" {
+  description = "The script to run on instance initialization"
   type        = string
-  default     = "ami-04b6019d38ea93034"
+  default     = <<-EOF
+  #!/bin/bash
+  echo "Instance created at $(date)" > ~/.instance_created
+  EOF
 }

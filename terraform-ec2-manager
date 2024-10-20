@@ -2,20 +2,29 @@
 
 # Suppress Terraform warnings
 export TF_CLI_ARGS_plan="-compact-warnings"
-export TF_CLI_ARGS_apply="-compact-warnings"
-export TF_CLI_ARGS_destroy="-compact-warnings"
+export TF_CLI_ARGS_apply="-compact-warnings -auto-approve"
+export TF_CLI_ARGS_destroy="-compact-warnings -auto-approve"
+export PS3=$'\e[32mSelect a number: \e[0m'
 
-echo "Terraform execution started"
+echo -e '''\e[35m
+████████╗███████╗    ███████╗ ██████╗██████╗ 
+╚══██╔══╝██╔════╝    ██╔════╝██╔════╝╚════██╗
+   ██║   █████╗█████╗█████╗  ██║      █████╔╝
+   ██║   ██╔══╝╚════╝██╔══╝  ██║     ██╔═══╝ 
+   ██║   ██║         ███████╗╚██████╗███████╗
+   ╚═╝   ╚═╝         ╚══════╝ ╚═════╝╚══════╝                                      
+\e[0m'''
+echo -e "\e[35mTerraform execution script started\e[0m"
 
 # Check if Terraform is installed
-if ! terraform --version; then
-  echo "Terraform is not installed"
+if ! terraform --version 1> /dev/null 2>&1; then
+  echo -e "\e[31mTerraform is not installed\e[0m"
   exit 1
 fi
 
 # Check if any .tfvars file exists
 if ! ls *.tfvars 1> /dev/null 2>&1; then
-  echo "No .tfvars file found"
+  echo -e "\e[31mNo .tfvars file found\e[0m"
   exit 1
 fi
 
@@ -30,37 +39,47 @@ fi
 # Scan all modules in root main.tf
 modules=$(terraform get -update | awk '{print $2}')
 
-echo "What action do you want to perform? Select a number:"
+echo -e "\e[35mWhat action do you want to perform?\e[0m"
 select action in "plan" "apply" "destroy"
 do
+  echo -e "\e[35mYou selected \e[36m$action\e[0m"
+  echo
   case $action in
     plan)
-      echo "Which module do you want to plan? Select a number:"
+      echo -e "\e[32mWhich module do you want to plan?\e[0m"
       select module in $modules
       do
         module_name=module.$module
+        state_list=$(terraform state list | grep $module)
+        for state in $state_list
+        do
+          terraform state rm $state
+        done
         terraform plan -target=$module_name
         break
       done
       ;;
     apply)
-      echo "Which module do you want to apply? Select a number:"
+      echo -e "\e[33mWhich module do you want to apply?\e[0m"
       select module in $modules
       do
         module_name=module.$module
-        terraform apply -auto-approve -target=$module_name
-        echo "Terraform output:"
-        terraform output
+        state_list=$(terraform state list | grep $module)
+        for state in $state_list
+        do
+          terraform state rm $state
+        done
+        terraform apply -target=$module_name
         break
       done
       ;;
     destroy)
-      echo "Which module do you want to destroy? Select a number:"
+      echo -e "\e[31mWhich module do you want to destroy?\e[0m"
+      echo -e "\e[33mNote that, if you destroy ec2-create-delete module, you should also destroy ec2-start-stop module as well\e[0m"
       select module in $modules
       do
         module_name=module.$module
-        terraform destroy -auto-approve -target=$module_name
-        echo "Note that, if you destroy ec2-create-delete module, you should also destroy ec2-start-stop module as well"
+        terraform destroy -target=$module_name
         break
       done
       ;;
@@ -71,4 +90,4 @@ do
   break
 done
 
-echo "Terraform execution completed"
+echo -e "\e[35mTerraform execution script ended\e[0m"
